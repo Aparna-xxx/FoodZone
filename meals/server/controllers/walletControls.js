@@ -3,6 +3,7 @@ const db = require('../db.js');
 exports.walletAmount = async (req, res) => {
     try {
         const { userId } = req.query;
+        console.log(userId);
         const trimmedUserId = userId.trim();
         db.query('SELECT amount FROM wallet WHERE regno = ?', [trimmedUserId], (err, results) => {
         if (err) {

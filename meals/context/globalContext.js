@@ -1,9 +1,10 @@
 import axios from 'axios';
 import React, { createContext, useContext, useState } from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import Category from '../server/models/category';
 import Meal from '../server/models/meal';
 
-const BASE_URL = "http://192.168.57.202:5000/FOOD-ZONE/";
+const BASE_URL = "http://192.168.43.160:5000/FOOD-ZONE/";
 
 const GlobalContext = createContext();
 
@@ -18,6 +19,8 @@ export const GlobalProvider = ({ children }) => {
                 params: { regno, pwd }
             });
             if (response.data.response == true) {
+                await AsyncStorage.setItem('userId', regno); // Save user ID in AsyncStorage
+                setUserId(regno); // Capture user ID in state
                 return true;
             } else if(response.data.response == 'invalidPWD'){
                 return 'invalidPWD';
@@ -37,6 +40,8 @@ export const GlobalProvider = ({ children }) => {
                 pwd
             });
             if (response.data.response == true) {
+                await AsyncStorage.setItem('userId', regno); // Save user ID in AsyncStorage
+                setUserId(regno); // Capture user ID in state
                 return true;
             } else if (response.data.response == 'exists'){
                 return "exists";
@@ -44,6 +49,16 @@ export const GlobalProvider = ({ children }) => {
         } catch (error) {
             console.error('Network Error:', error);
             setError('There was a network error. Please try again later.');
+        }
+    };
+
+    const logout = async () => {
+        try {
+            await AsyncStorage.clear();
+            setUserId(null);
+        } catch (error) {
+            console.error('Logout Error:', error);
+            setError('There was a problem logging out. Please try again later.');
         }
     };
 
@@ -104,7 +119,6 @@ export const GlobalProvider = ({ children }) => {
             setError('There was a network error. Please try again later.');
         }
     };
-    
 
     const addToCart = (mealId, quantity = 1) => {
         setCart((prevCart) => ({
@@ -137,6 +151,7 @@ export const GlobalProvider = ({ children }) => {
         <GlobalContext.Provider value={{
             login,
             signup,
+            logout,
             fetchMealsByCategory,
             fetchWalletBalance,
             addWalletAmount,

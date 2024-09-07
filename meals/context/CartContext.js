@@ -18,7 +18,7 @@ async function fetchMealsByIds(mealIds) {
         const queryString = mealIds.map(id => `mealId=${id}`).join('&');
 
         // Fetch the meals with the properly formatted URL
-        const response = await fetch(`http://192.168.57.202:5000/FOOD-ZONE/addMealsById?${queryString}`, {
+        const response = await fetch(`http://192.168.43.160:5000/FOOD-ZONE/addMealsById?${queryString}`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',

@@ -1,4 +1,3 @@
-import { useRoute } from "@react-navigation/native";
 import React, { useEffect, useState } from 'react';
 import { FlatList, ImageBackground, StyleSheet, View } from 'react-native';
 import CategoryGridTile from '../components/CategoryGridTile';
@@ -9,8 +8,6 @@ function CategoryScreen({ navigation }) {
   const { fetchCategories } = useGlobalContext();
   const [categories, setCategories] = useState([]);
 
-  const route = useRoute();
-  const userId = route.params.collegeID;
 
   useEffect(() => {
     fetchCategories().then(setCategories);

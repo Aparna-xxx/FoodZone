@@ -59,7 +59,7 @@ const HomeScreen = () => {
             await AsyncStorage.setItem('collegeID', collegeID);
             await AsyncStorage.setItem('password', password);
             captureUserId(collegeID);
-            Navigation.navigate('MealsCategory', {collegeID});
+            Navigation.navigate('MealsCategory');
         } else if (valid === 'invalidPWD') {
             alert('Invalid password. Please try again.');
         } else {

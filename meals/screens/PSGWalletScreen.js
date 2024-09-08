@@ -1,5 +1,6 @@
 import { MaterialIcons } from '@expo/vector-icons';
-import React, { useEffect, useState } from 'react';
+import { useFocusEffect } from '@react-navigation/native';
+import React, { useCallback, useState } from 'react';
 import { ActivityIndicator, Dimensions, Modal, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
 import { useGlobalContext } from '../context/globalContext';
 import Colors from '../utils/Colors';
@@ -12,18 +13,21 @@ function PSGWalletScreen() {
   const [modalVisible, setModalVisible] = useState(false);
   const [successModalVisible, setSuccessModalVisible] = useState(false);
   const [rechargeAmount, setRechargeAmount] = useState('');
-  const [walletBalance, setWalletBalance] = useState(null);
-  const [lastRechargeAmount, setLastRechargeAmount] = useState(null); // New state to store the last recharge amount
+  const [walletBalance, setWalletBalance] = useState(0); // Initialize with default value
+  const [lastRechargeAmount, setLastRechargeAmount] = useState(null); // Store the last recharge amount
 
   const { fetchWalletBalance, userId, addWalletAmount } = useGlobalContext();
 
+  // Function to load wallet balance from the database
   const loadBalance = async () => {
+    setLoading(true); // Ensure loading state is set when reloading balance
     try {
       const balance = await fetchWalletBalance(userId);
       const numericBalance = Number(balance); // Type cast to number
 
       if (!isNaN(numericBalance)) {
-        setWalletBalance(numericBalance);
+        setWalletBalance(numericBalance); // Update state with fetched balance
+        setError(null); // Clear error if balance is fetched successfully
       } else {
         throw new Error('Invalid balance value');
       }
@@ -34,10 +38,12 @@ function PSGWalletScreen() {
     }
   };
 
-  useEffect(() => {
-    // Fetch wallet balance when the component mounts
-    loadBalance();
-  }, []);
+  // Use useFocusEffect to fetch balance when the screen is focused
+  useFocusEffect(
+    useCallback(() => {
+      loadBalance();
+    }, [userId])
+  );
 
   const handleRecharge = () => {
     setModalVisible(true);
@@ -51,13 +57,14 @@ function PSGWalletScreen() {
     }
 
     try {
-      const finalAmount = amount + walletBalance;
-      await addWalletAmount(userId, finalAmount);
-      setLastRechargeAmount(amount); // Store the recharge amount before resetting
-      await loadBalance(); // Refresh the balance after a successful recharge
+      // Calculate the new balance by adding the recharge amount to the current balance
+      const newBalance = walletBalance + amount;
+      await addWalletAmount(userId, newBalance);
+      setLastRechargeAmount(amount);
+      setSuccessModalVisible(true);
+      await loadBalance();
       setModalVisible(false);
-      setRechargeAmount(''); // Clear the input field
-      setSuccessModalVisible(true); // Show success modal after recharge
+      setRechargeAmount('');
     } catch (err) {
       alert('Failed to add amount to wallet.');
     }
@@ -87,7 +94,7 @@ function PSGWalletScreen() {
     <View style={styles.container}>
       <Text style={styles.title}>PSG Wallet</Text>
       <Text style={styles.balanceText}>
-        Current Balance: ₹{walletBalance !== null ? walletBalance.toFixed(2) : '0.00'}
+        Current Balance: ₹{walletBalance.toFixed(2)} {/* Ensure balance is displayed */}
       </Text>
       <Pressable style={styles.rechargeButton} onPress={handleRecharge}>
         <Text style={styles.rechargeButtonText}>Recharge via UPI</Text>
@@ -257,7 +264,8 @@ const styles = StyleSheet.create({
     fontFamily: 'Manrope_400Regular',
     fontSize: 18,
     color: 'black',
-    marginTop: 10,
+    marginBottom: 20,
+    textAlign: 'center',
   },
   successButton: {
     backgroundColor: 'black',
@@ -265,7 +273,6 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     width: '100%',
     alignItems: 'center',
-    marginTop: 20,
   },
   successButtonText: {
     color: Colors.White700,

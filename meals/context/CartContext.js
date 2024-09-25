@@ -1,5 +1,8 @@
 import React, { createContext, useState } from 'react';
 
+const BASE_URL = "http://192.168.1.6:5000/FOOD-ZONE/";
+
+
 async function fetchMealsByIds(mealIds) {
     try {
         console.log("Fetching meals for IDs:", mealIds);  // Debugging statement
@@ -18,7 +21,7 @@ async function fetchMealsByIds(mealIds) {
         const queryString = mealIds.map(id => `mealId=${id}`).join('&');
 
         // Fetch the meals with the properly formatted URL
-        const response = await fetch(`http://192.168.43.160:5000/FOOD-ZONE/addMealsById?${queryString}`, {
+        const response = await fetch(`${BASE_URL}addMealsById?${queryString}`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',

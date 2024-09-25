@@ -79,7 +79,7 @@ const HomeScreen = () => {
                         setCollegeID(savedCollegeID);
                         setPassword(savedPassword);
                         captureUserId(savedCollegeID);
-                        Navigation.navigate('MealsCategory', {collegeID: savedCollegeID});
+                        Navigation.navigate('MealsCategory');
                     }
                 }
             } catch (error) {

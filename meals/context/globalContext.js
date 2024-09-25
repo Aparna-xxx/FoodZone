@@ -1,10 +1,10 @@
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import React, { createContext, useContext, useState } from 'react';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import Category from '../server/models/category';
 import Meal from '../server/models/meal';
 
-const BASE_URL = "http://192.168.43.160:5000/FOOD-ZONE/";
+const BASE_URL = "http://192.168.1.6:5000/FOOD-ZONE/";
 
 const GlobalContext = createContext();
 
@@ -120,11 +120,19 @@ export const GlobalProvider = ({ children }) => {
         }
     };
 
-    const addToCart = (mealId, quantity = 1) => {
-        setCart((prevCart) => ({
-            ...prevCart,
-            [mealId]: (prevCart[mealId] || 0) + quantity,
-        }));
+    const addToCart = (mealId, quantity) => {
+        setCart((prevCart) => {
+            const existingMeal = prevCart.find(item => item.meal_id === mealId);
+            if (existingMeal) {
+                return prevCart.map(item =>
+                    item.meal_id === mealId
+                        ? { ...item, quantity: item.quantity + quantity }
+                        : item
+                );
+            } else {
+                return [...prevCart, { meal_id: mealId, quantity }];
+            }
+        });
     };
 
     const removeFromCart = (mealId, quantity = 1) => {

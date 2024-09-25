@@ -1,14 +1,19 @@
+import AntDesign from '@expo/vector-icons/AntDesign';
+import axios from 'axios'; // Import Axios
 import React, { useContext, useEffect, useState } from 'react';
 import { Dimensions, FlatList, Pressable, StyleSheet, Text, View } from 'react-native';
-import AntDesign from '@expo/vector-icons/AntDesign';
 import { CartContext } from '../context/CartContext';
+import { useGlobalContext } from '../context/globalContext';
 import Colors from '../utils/Colors';
 
 const ScreenWidth = Dimensions.get('window').width;
+const BASE_URL = "http://192.168.1.6:5000/FOOD-ZONE/";
+
 
 function CartScreen({ navigation }) {
     const { cart, addToCart, removeFromCart, clearCart, fetchMealsByIds } = useContext(CartContext);
     const [cartItems, setCartItems] = useState([]);
+    const { userId } = useGlobalContext();
 
     useEffect(() => {
         const fetchCartItems = async () => {
@@ -63,6 +68,29 @@ function CartScreen({ navigation }) {
         );
     }
 
+    const handleConfirmOrder = async () => {
+        const user_id = userId.trim();
+        const orderData = {
+            user_id,
+            cartItems: cartItems.map(item => ({
+                meal_id: item.id,
+                category_id: item.categoryIds[0], // Assuming categoryIds is an array and using the first one
+                title: item.title,
+                price: item.price,
+                quantity: item.quantity,
+            }))
+        };
+
+        try {
+            const response = await axios.post(`${BASE_URL}saveCart`, orderData);
+            console.log(response.data);
+            navigation.navigate('OrderSummary', { cartItems, totalPrice }); // Navigate on success
+        } catch (error) {
+            console.error("Error saving cart:", error);
+            // Optionally show an error message to the user
+        }
+    };
+
     return (
         <View style={styles.container}>
             {cartItems.length === 0 ? (
@@ -85,7 +113,7 @@ function CartScreen({ navigation }) {
                         </Pressable>
                         <Pressable
                             style={styles.confirmButton}
-                            onPress={() => navigation.navigate('OrderSummary', { cartItems, totalPrice })}
+                            onPress={handleConfirmOrder} // Call the handleConfirmOrder function
                         >
                             <Text style={styles.confirmButtonText}>Confirm Order</Text>
                         </Pressable>

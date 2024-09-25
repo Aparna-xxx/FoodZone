@@ -11,8 +11,9 @@ function OrderSummaryScreen({ route, navigation }) {
     const { cartItems, totalPrice } = route.params;
     const [showBackModal, setShowBackModal] = useState(false);
     const [showInsufficientFundsModal, setShowInsufficientFundsModal] = useState(false);
-    const [showSuccessModal, setShowSuccessModal] = useState(false); // Success modal state
+    const [showSuccessModal, setShowSuccessModal] = useState(false);
     const [walletBalance, setWalletBalance] = useState(0);
+
 
     const { clearCart } = useContext(CartContext);
     const { fetchWalletBalance, userId, addWalletAmount } = useGlobalContext();

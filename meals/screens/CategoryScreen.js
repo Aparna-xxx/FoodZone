@@ -16,7 +16,7 @@ function CategoryScreen({ navigation }) {
   function renderCategoryItem(itemObject) {
     function pressHandler() {
       navigation.navigate("MealDescription", {
-        CategoryId: itemObject.item.id
+        CategoryId: itemObject.item.id,
       });
     }
 

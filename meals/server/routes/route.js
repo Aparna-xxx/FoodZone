@@ -14,6 +14,6 @@ Router.post("/signup", signup)
     .get("/wallet", Wallet.walletAmount)
     .post("/addWalletAmount", Wallet.addWalletAmount)
     .get("/addMealsById", Cart.addByMealsId)
-    
+    .post("/saveCart", Cart.saveCart)
 
 module.exports = Router;

@@ -15,6 +15,7 @@ import MealsDetailsScreen from './screens/MealsDetailsScreen';
 import OrderSummaryScreen from './screens/OrderSummaryScreen';
 import PSGWalletScreen from './screens/PSGWalletScreen';
 import Colors from './utils/Colors';
+import TokenScreen from './screens/TokenScreen';
 
 const Stack = createNativeStackNavigator();
 const Drawer = createDrawerNavigator();
@@ -33,6 +34,7 @@ function StackNavigator() {
       <Stack.Screen name="CartStack" component={CartScreen} />
       <Stack.Screen name="OrderSummary" component={OrderSummaryScreen} />
       <Stack.Screen name="HomeScreen" component={HomeScreen} />
+      <Stack.Screen name="TokenScreen" component={TokenScreen} />
     </Stack.Navigator>
   );
 }

@@ -153,14 +153,14 @@ function OrderSummaryScreen({ route, navigation }) {
             >
                 <View style={styles.modalContainer}>
                     <View style={styles.modalContent}>
-                        <Text style={styles.modalText}>Order has been successfully placed!</Text>
+                        <Text style={styles.modalText}>Are you sure you want to continue with payment ?</Text>
                         <View style={styles.modalButtonContainer}>
                             <Pressable
                                 style={styles.modalButton}
                                 onPress={() => {
                                     setShowSuccessModal(false);
                                     clearCart(); // Clear the cart after successful payment
-                                    navigation.navigate('MealsCategory'); // Redirect to meals category or another screen
+                                    navigation.navigate('TokenScreen'); // Redirect to meals category or another screen
                                 }}
                             >
                                 <Text style={styles.modalButtonText}>OK</Text>
@@ -169,7 +169,10 @@ function OrderSummaryScreen({ route, navigation }) {
                     </View>
                 </View>
             </Modal>
+
         </View>
+
+        
     );
 }
 

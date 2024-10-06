@@ -7,7 +7,7 @@ import { useGlobalContext } from '../context/globalContext';
 import Colors from '../utils/Colors';
 
 const ScreenWidth = Dimensions.get('window').width;
-const BASE_URL = "http://192.168.1.6:5000/FOOD-ZONE/";
+const BASE_URL = "http://192.168.0.106:5000/FOOD-ZONE/";
 
 
 function CartScreen({ navigation }) {

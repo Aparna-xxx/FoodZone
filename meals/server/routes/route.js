@@ -6,6 +6,7 @@ const Meals = require("../controllers/mealControls");
 const Wallet = require("../controllers/walletControls");
 const Categories = require("../controllers/categoryControls");
 const Cart = require("../controllers/cartControls");
+const Order = require("../controllers/orderControls");
 
 Router.post("/signup", signup)
     .get("/signin", signin)
@@ -14,6 +15,7 @@ Router.post("/signup", signup)
     .get("/wallet", Wallet.walletAmount)
     .post("/addWalletAmount", Wallet.addWalletAmount)
     .get("/addMealsById", Cart.addByMealsId)
-    .post("/saveCart", Cart.saveCart)
+    .post("/saveOrder", Order.saveOrder)
+   
 
 module.exports = Router;

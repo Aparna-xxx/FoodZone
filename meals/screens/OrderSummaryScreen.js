@@ -1,11 +1,15 @@
 import { useFocusEffect } from '@react-navigation/native';
 import React, { useContext, useState } from 'react';
+import axios from 'axios'; 
 import { BackHandler, Dimensions, FlatList, Modal, Pressable, StyleSheet, Text, View } from 'react-native';
 import { CartContext } from '../context/CartContext';
 import { useGlobalContext } from '../context/globalContext';
 import Colors from '../utils/Colors';
 
+
 const ScreenWidth = Dimensions.get('window').width;
+
+const BASE_URL = "http://192.168.1.144:5000/FOOD-ZONE/";
 
 function OrderSummaryScreen({ route, navigation }) {
     const { cartItems, totalPrice } = route.params;
@@ -13,7 +17,6 @@ function OrderSummaryScreen({ route, navigation }) {
     const [showInsufficientFundsModal, setShowInsufficientFundsModal] = useState(false);
     const [showSuccessModal, setShowSuccessModal] = useState(false);
     const [walletBalance, setWalletBalance] = useState(0);
-
 
     const { clearCart } = useContext(CartContext);
     const { fetchWalletBalance, userId, addWalletAmount } = useGlobalContext();
@@ -42,6 +45,29 @@ function OrderSummaryScreen({ route, navigation }) {
         console.log('Pay via UPI');
     };
 
+    const saveOrderToDB = async () => {
+        const user_id = userId.trim();
+        const orderData = {
+            user_id,
+            cartItems: cartItems.map(item => ({
+                meal_id: item.id,
+                category_id: item.categoryIds[0], // Assuming categoryIds is an array and using the first one
+                title: item.title,
+                price: item.price,
+                quantity: item.quantity,
+            }))
+        };
+
+        try {
+            const response = await axios.post(`${BASE_URL}saveOrder`, orderData);
+            console.log(response.data);
+            navigation.navigate('TokenScreen'); // Redirect to meals category or another screen
+        } catch (error) {
+            console.error("Error saving cart:", error);
+            // Optionally show an error message to the user
+        }
+    }
+
     const handlePsgWalletPayment = () => {
         if (walletBalance < totalPrice) {
             setShowInsufficientFundsModal(true);
@@ -49,9 +75,15 @@ function OrderSummaryScreen({ route, navigation }) {
             const deductedAmount = walletBalance - totalPrice;
             addWalletAmount(userId, deductedAmount); // Update wallet balance
             setWalletBalance(deductedAmount); // Reflect the new balance
-            setShowSuccessModal(true); // Show success modal
+            // setShowSuccessModal(true); // Show success modal
+            saveOrderToDB();
         }
     };
+
+
+    
+  
+    
 
     const handleConfirmBack = () => {
         setShowBackModal(false);
@@ -95,7 +127,8 @@ function OrderSummaryScreen({ route, navigation }) {
                 <Pressable style={styles.payButton1} onPress={handleUpiPayment}>
                     <Text style={styles.payButtonText}>Pay via UPI</Text>
                 </Pressable>
-                <Pressable style={styles.payButton2} onPress={handlePsgWalletPayment}>
+                <Pressable style={styles.payButton2}  onPress={() => setShowSuccessModal(true)} >
+                {/* onPress={handlePsgWalletPayment} */}
                     <Text style={styles.payButtonText}>Pay via PSG Wallet</Text>
                 </Pressable>
             </View>
@@ -159,8 +192,8 @@ function OrderSummaryScreen({ route, navigation }) {
                                 style={styles.modalButton}
                                 onPress={() => {
                                     setShowSuccessModal(false);
+                                    handlePsgWalletPayment();
                                     clearCart(); // Clear the cart after successful payment
-                                    navigation.navigate('TokenScreen'); // Redirect to meals category or another screen
                                 }}
                             >
                                 <Text style={styles.modalButtonText}>OK</Text>

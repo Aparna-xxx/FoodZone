@@ -1,10 +1,20 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
+import QRCode from 'react-native-qrcode-svg';
+
 
 const TokenScreen = () => {
+  let logoFromFile = require('../assets/images/diamond.png');
   return (
     <View style={styles.container}>
-      <Text style={styles.text}>Hello World</Text>
+      <QRCode
+        value="Just some string value"
+        logo={logoFromFile}
+        size={300}
+      />
+    <Text style={styles.text}>
+      Use this E-token to generate physical tokens from the canteen premises
+    </Text>
     </View>
   );
 };
@@ -12,13 +22,19 @@ const TokenScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
+    // justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: '#EEF5FF', // Using the background color you like
+    paddingTop:80,
   },
   text: {
+    fontFamily: 'Manrope_400Regular',
     fontSize: 20,
-    color: '#333', // Dark text color for contrast
+    color: 'black',
+    padding:30,
+    textAlign:'center',
+    marginTop:40,
+    
   },
 });
 

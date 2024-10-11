@@ -1,6 +1,6 @@
 import React, { createContext, useState } from 'react';
 
-const BASE_URL = "http://192.168.0.106:5000/FOOD-ZONE/";
+const BASE_URL = "http://192.168.1.144:5000/FOOD-ZONE/";
 
 
 async function fetchMealsByIds(mealIds) {

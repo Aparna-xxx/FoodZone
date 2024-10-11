@@ -7,7 +7,7 @@ import { useGlobalContext } from '../context/globalContext';
 import Colors from '../utils/Colors';
 
 const ScreenWidth = Dimensions.get('window').width;
-const BASE_URL = "http://192.168.0.106:5000/FOOD-ZONE/";
+const BASE_URL = "http://192.168.1.144:5000/FOOD-ZONE/";
 
 
 function CartScreen({ navigation }) {
@@ -82,8 +82,8 @@ function CartScreen({ navigation }) {
         };
 
         try {
-            const response = await axios.post(`${BASE_URL}saveCart`, orderData);
-            console.log(response.data);
+            // const response = await axios.post(`${BASE_URL}saveCart`, orderData);
+            // console.log(response.data);
             navigation.navigate('OrderSummary', { cartItems, totalPrice }); // Navigate on success
         } catch (error) {
             console.error("Error saving cart:", error);

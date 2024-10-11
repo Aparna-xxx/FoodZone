@@ -49,8 +49,9 @@ function MealItem(props) {
                 <View style={styles.InnerContainer}>
                     <View>
                         <Image source={{ uri: props.imageURL }} style={styles.imageStyle} />
-                        <Text style={styles.titleStyle}>{props.title}</Text>
-                        <Text style={styles.priceStyle}>{`₹${props.price}`}</Text>
+                        <Text style={styles.titleStyle}>{props.title}    Price:{`₹${props.price}`}</Text>
+                        <Text style={styles.priceStyle}>Stock Remaining: {props.stock}</Text>
+
                     </View>
                     <View style={styles.textContainer}>
                         <Pressable style={({ pressed }) => pressed ? styles.Pressed : null} onPress={decrementQuantity}>

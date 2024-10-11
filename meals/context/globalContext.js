@@ -4,7 +4,7 @@ import React, { createContext, useContext, useState } from 'react';
 import Category from '../server/models/category';
 import Meal from '../server/models/meal';
 
-const BASE_URL = "http://192.168.0.106:5000/FOOD-ZONE/";
+const BASE_URL = "http://192.168.1.144:5000/FOOD-ZONE/";
 
 const GlobalContext = createContext();
 
@@ -74,10 +74,7 @@ export const GlobalProvider = ({ children }) => {
                 item.title,
                 item.price,
                 item.imageUrl,
-                item.isGlutenFree,
-                item.isVegan,
-                item.isVegetarian,
-                item.isLactoseFree
+                item.stock,
             ));
         } catch (error) {
             console.error('Network Error:', error);

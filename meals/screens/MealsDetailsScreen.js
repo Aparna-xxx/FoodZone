@@ -37,6 +37,7 @@ function MealsDetailsScreen({ navigation }) {
             title: item.title,
             imageURL: item.imageUrl,
             price: item.price,
+            stock:item.stock,
             updateCart: handleUpdateCart,
         };
         return <MealItem {...MealItemProps} />;

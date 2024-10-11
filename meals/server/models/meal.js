@@ -6,6 +6,7 @@ class Meal {
    
     price,
     imageUrl,
+    stock,
     
    
     isGlutenFree,
@@ -17,6 +18,7 @@ class Meal {
     this.categoryIds = categoryIds;
     this.title = title;
     this.imageUrl = imageUrl;
+    this.stock=stock;
   
    
     this.price = price;

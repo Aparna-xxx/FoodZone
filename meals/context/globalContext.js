@@ -4,7 +4,7 @@ import React, { createContext, useContext, useState } from 'react';
 import Category from '../server/models/category';
 import Meal from '../server/models/meal';
 
-const BASE_URL = "http://192.168.95.81:5000/FOOD-ZONE/";
+const BASE_URL = "http://192.168.100.4:5000/FOOD-ZONE/";
 
 const GlobalContext = createContext();
 
@@ -14,7 +14,7 @@ export const GlobalProvider = ({ children }) => {
     const [userId, setUserId] = useState(null);
     const [cartItems, setCartItems] = useState([]);
     const [totalPrice, setTotalPrice] = useState(0);
-
+    
     const login = async (regno, pwd) => {
         try {
             const response = await axios.get(`${BASE_URL}signin`, {
@@ -220,10 +220,10 @@ export const GlobalProvider = ({ children }) => {
 
         try {
             const response = await axios.post(`${BASE_URL}saveOrder`, orderData);
-            return response.data; // return the response for further processing if needed
-        } catch (error) {
+            return response.data;
+          } catch (error) {
             console.error("Error saving order:", error);
-        }
+          }
     };
 
     return (

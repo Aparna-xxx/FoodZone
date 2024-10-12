@@ -11,6 +11,7 @@ function OrderSummaryScreen({ navigation }) {
     const [showInsufficientFundsModal, setShowInsufficientFundsModal] = useState(false);
     const [showSuccessModal, setShowSuccessModal] = useState(false);
     const [walletBalance, setWalletBalance] = useState(0);
+    const [orderId, setOrderId] = useState(null);
     
     const { fetchWalletBalance, userId, cartItems, clearCart, totalPrice, addWalletAmount, saveOrderToDataBase } = useGlobalContext();
 
@@ -38,17 +39,41 @@ function OrderSummaryScreen({ navigation }) {
         console.log('Pay via UPI');
     };
 
+    // const saveOrderToDB = async () => {
+    //     try {
+    //         const response = await saveOrderToDataBase();
+    //         console.log(response);
+    //         if (response) {
+    //             clearCart();
+    //             navigation.navigate('TokenScreen');
+    //         }
+    //     } catch (error) {
+    //         console.error("Error saving order: ", error);
+    //     }
+    // };
     const saveOrderToDB = async () => {
         try {
             const response = await saveOrderToDataBase();
-            if (response) {
+            console.log('Full response:', response);  // Log the full response to inspect its structure
+            
+            if (response && response.order_id) {  // Check if response and order_id exist
+                const newOrderId = response.order_id;  // Extract order_id
+                setOrderId(newOrderId);
+                console.log("New order ID: ", newOrderId); // Log new order ID immediately
+    
                 clearCart();
-                navigation.navigate('TokenScreen');
+                // Pass the newOrderId directly to navigation
+                navigation.navigate('TokenScreen', { orderId: newOrderId });
+                console.log("Navigating to TokenScreen with Order ID:", newOrderId); // Log the new order ID for navigation
+            } else {
+                console.error('No order_id in response:', response);
             }
         } catch (error) {
             console.error("Error saving order: ", error);
         }
     };
+    
+    
 
     const handlePsgWalletPayment = async () => {
         if (walletBalance < totalPrice) {
@@ -61,7 +86,7 @@ function OrderSummaryScreen({ navigation }) {
                 setWalletBalance(newBalance);
                 await saveOrderToDB();
                 clearCart();
-                navigation.navigate('TokenScreen');
+                navigation.navigate('TokenScreen', { orderId });
             } catch (error) {
                 console.error("Error processing payment: ", error);
             }

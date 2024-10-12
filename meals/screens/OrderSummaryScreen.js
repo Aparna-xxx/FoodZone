@@ -1,25 +1,18 @@
 import { useFocusEffect } from '@react-navigation/native';
-import React, { useContext, useState } from 'react';
-import axios from 'axios'; 
+import React, { useState } from 'react';
 import { BackHandler, Dimensions, FlatList, Modal, Pressable, StyleSheet, Text, View } from 'react-native';
-import { CartContext } from '../context/CartContext';
 import { useGlobalContext } from '../context/globalContext';
 import Colors from '../utils/Colors';
 
-
 const ScreenWidth = Dimensions.get('window').width;
 
-const BASE_URL = "http://192.168.1.144:5000/FOOD-ZONE/";
-
-function OrderSummaryScreen({ route, navigation }) {
-    const { cartItems, totalPrice } = route.params;
+function OrderSummaryScreen({ navigation }) {
     const [showBackModal, setShowBackModal] = useState(false);
     const [showInsufficientFundsModal, setShowInsufficientFundsModal] = useState(false);
     const [showSuccessModal, setShowSuccessModal] = useState(false);
     const [walletBalance, setWalletBalance] = useState(0);
-
-    const { clearCart } = useContext(CartContext);
-    const { fetchWalletBalance, userId, addWalletAmount } = useGlobalContext();
+    
+    const { fetchWalletBalance, userId, cartItems, clearCart, totalPrice, addWalletAmount, saveOrderToDataBase } = useGlobalContext();
 
     useFocusEffect(
         React.useCallback(() => {
@@ -46,44 +39,34 @@ function OrderSummaryScreen({ route, navigation }) {
     };
 
     const saveOrderToDB = async () => {
-        const user_id = userId.trim();
-        const orderData = {
-            user_id,
-            cartItems: cartItems.map(item => ({
-                meal_id: item.id,
-                category_id: item.categoryIds[0], // Assuming categoryIds is an array and using the first one
-                title: item.title,
-                price: item.price,
-                quantity: item.quantity,
-            }))
-        };
-
         try {
-            const response = await axios.post(`${BASE_URL}saveOrder`, orderData);
-            console.log(response.data);
-            navigation.navigate('TokenScreen'); // Redirect to meals category or another screen
+            const response = await saveOrderToDataBase();
+            if (response) {
+                clearCart();
+                navigation.navigate('TokenScreen');
+            }
         } catch (error) {
-            console.error("Error saving cart:", error);
-            // Optionally show an error message to the user
-        }
-    }
-
-    const handlePsgWalletPayment = () => {
-        if (walletBalance < totalPrice) {
-            setShowInsufficientFundsModal(true);
-        } else {
-            const deductedAmount = walletBalance - totalPrice;
-            addWalletAmount(userId, deductedAmount); // Update wallet balance
-            setWalletBalance(deductedAmount); // Reflect the new balance
-            // setShowSuccessModal(true); // Show success modal
-            saveOrderToDB();
+            console.error("Error saving order: ", error);
         }
     };
 
+    const handlePsgWalletPayment = async () => {
+        if (walletBalance < totalPrice) {
+            setShowInsufficientFundsModal(true);
+        } else {
+            const newBalance = walletBalance - totalPrice;
 
-    
-  
-    
+            try {
+                await addWalletAmount(userId, newBalance);
+                setWalletBalance(newBalance);
+                await saveOrderToDB();
+                clearCart();
+                navigation.navigate('TokenScreen');
+            } catch (error) {
+                console.error("Error processing payment: ", error);
+            }
+        }
+    };
 
     const handleConfirmBack = () => {
         setShowBackModal(false);
@@ -116,7 +99,7 @@ function OrderSummaryScreen({ route, navigation }) {
             <Text style={styles.title}>Order Summary</Text>
             <FlatList
                 data={cartItems}
-                keyExtractor={(item) => item.id}
+                keyExtractor={(item) => item.id.toString()} // Ensure unique key
                 renderItem={renderCartItem}
             />
             <View style={styles.totalPriceContainer}>
@@ -127,8 +110,7 @@ function OrderSummaryScreen({ route, navigation }) {
                 <Pressable style={styles.payButton1} onPress={handleUpiPayment}>
                     <Text style={styles.payButtonText}>Pay via UPI</Text>
                 </Pressable>
-                <Pressable style={styles.payButton2}  onPress={() => setShowSuccessModal(true)} >
-                {/* onPress={handlePsgWalletPayment} */}
+                <Pressable style={styles.payButton2} onPress={() => setShowSuccessModal(true)}>
                     <Text style={styles.payButtonText}>Pay via PSG Wallet</Text>
                 </Pressable>
             </View>
@@ -186,14 +168,13 @@ function OrderSummaryScreen({ route, navigation }) {
             >
                 <View style={styles.modalContainer}>
                     <View style={styles.modalContent}>
-                        <Text style={styles.modalText}>Are you sure you want to continue with payment ?</Text>
+                        <Text style={styles.modalText}>Are you sure you want to continue with payment?</Text>
                         <View style={styles.modalButtonContainer}>
                             <Pressable
                                 style={styles.modalButton}
-                                onPress={() => {
-                                    setShowSuccessModal(false);
-                                    handlePsgWalletPayment();
-                                    clearCart(); // Clear the cart after successful payment
+                                onPress={async () => {
+                                    await handlePsgWalletPayment();
+                                    setShowSuccessModal(false); // Close modal after payment attempt
                                 }}
                             >
                                 <Text style={styles.modalButtonText}>OK</Text>
@@ -202,10 +183,7 @@ function OrderSummaryScreen({ route, navigation }) {
                     </View>
                 </View>
             </Modal>
-
         </View>
-
-        
     );
 }
 

@@ -27,6 +27,7 @@ function MealsDetailsScreen({ navigation }) {
     }, [catId, navigation]);
 
     const handleUpdateCart = (mealId, quantity) => {
+        console.log("from meal screen " + mealId + "" + quantity);
         addToCart(mealId, quantity); // Use addToCart instead
     };
 

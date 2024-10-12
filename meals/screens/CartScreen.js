@@ -1,33 +1,30 @@
 import AntDesign from '@expo/vector-icons/AntDesign';
-import axios from 'axios'; // Import Axios
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Dimensions, FlatList, Pressable, StyleSheet, Text, View } from 'react-native';
-import { CartContext } from '../context/CartContext';
 import { useGlobalContext } from '../context/globalContext';
 import Colors from '../utils/Colors';
 
 const ScreenWidth = Dimensions.get('window').width;
-const BASE_URL = "http://192.168.1.144:5000/FOOD-ZONE/";
-
 
 function CartScreen({ navigation }) {
-    const { cart, addToCart, removeFromCart, clearCart, fetchMealsByIds } = useContext(CartContext);
+    const { cart, addToCart, removeFromCart, clearCart, fetchMealsByIds, captureCartItems, captureTotalPrice } = useGlobalContext();
     const [cartItems, setCartItems] = useState([]);
-    const { userId } = useGlobalContext();
 
     useEffect(() => {
         const fetchCartItems = async () => {
-            const mealIds = Object.keys(cart);
+            const mealIds = Object.keys(cart).map(item => item.meal_id); // ensure you get meal_ids
             if (mealIds.length > 0) {
                 try {
-                    // Fetch all meals in one go by passing the array of mealIds
                     const fetchedMeals = await fetchMealsByIds(mealIds);
                     if (fetchedMeals && fetchedMeals.length > 0) {
-                        const items = fetchedMeals.map(meal => ({
-                            ...meal,
-                            quantity: cart[meal.id],  // Set quantity from cart
-                            totalPrice: meal.price * cart[meal.id],  // Calculate total price
-                        }));
+                        const items = fetchedMeals.map(meal => {
+                            const cartItem = cart.find(item => item.meal_id === meal.id);
+                            return {
+                                ...meal,
+                                quantity: cartItem ? cartItem.quantity : 0, // Use cartItem quantity
+                                totalPrice: (cartItem ? cartItem.quantity : 0) * meal.price,
+                            };
+                        });
                         setCartItems(items);
                     } else {
                         setCartItems([]);
@@ -43,8 +40,7 @@ function CartScreen({ navigation }) {
         fetchCartItems();
     }, [cart, fetchMealsByIds]);
 
-    // Calculate total price
-    const totalPrice = cartItems.reduce((sum, item) => sum + item.totalPrice, 0);
+    const totalPrice = cartItems.reduce((sum, item) => sum + (item.totalPrice || 0), 0);
 
     function renderCartItem(itemData) {
         const item = itemData.item;
@@ -53,7 +49,7 @@ function CartScreen({ navigation }) {
                 <View>
                     <Text style={styles.itemText}>{item.title}</Text>
                     <Text style={styles.itemText}>Quantity: {item.quantity}</Text>
-                    <Text style={styles.itemText}>Total Price: ₹{item.totalPrice.toFixed(2)}</Text>
+                    <Text style={styles.itemText}>Total Price: ₹{(item.totalPrice).toFixed(2)}</Text>
                 </View>
                 <View style={styles.buttonContainer}>
                     <Pressable style={styles.button} onPress={() => removeFromCart(item.id)}>
@@ -69,25 +65,12 @@ function CartScreen({ navigation }) {
     }
 
     const handleConfirmOrder = async () => {
-        const user_id = userId.trim();
-        const orderData = {
-            user_id,
-            cartItems: cartItems.map(item => ({
-                meal_id: item.id,
-                category_id: item.categoryIds[0], // Assuming categoryIds is an array and using the first one
-                title: item.title,
-                price: item.price,
-                quantity: item.quantity,
-            }))
-        };
-
         try {
-            // const response = await axios.post(`${BASE_URL}saveCart`, orderData);
-            // console.log(response.data);
-            navigation.navigate('OrderSummary', { cartItems, totalPrice }); // Navigate on success
+            captureCartItems(cartItems);
+            captureTotalPrice(totalPrice);
+            navigation.navigate('OrderSummary'); // Navigate on success
         } catch (error) {
             console.error("Error saving cart:", error);
-            // Optionally show an error message to the user
         }
     };
 
@@ -113,7 +96,7 @@ function CartScreen({ navigation }) {
                         </Pressable>
                         <Pressable
                             style={styles.confirmButton}
-                            onPress={handleConfirmOrder} // Call the handleConfirmOrder function
+                            onPress={handleConfirmOrder}
                         >
                             <Text style={styles.confirmButtonText}>Confirm Order</Text>
                         </Pressable>
@@ -149,7 +132,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         width: ScreenWidth / 2,
-        justifyContent: 'space-between', // Ensure buttons are spaced out
+        justifyContent: 'space-between',
     },
     button: {
         backgroundColor: Colors.White700,
@@ -162,7 +145,7 @@ const styles = StyleSheet.create({
         fontFamily: 'Manrope_400Regular',
         fontSize: 16,
         color: 'black',
-        marginHorizontal: 20, // Space between the plus and minus buttons
+        marginHorizontal: 20,
     },
     totalPriceContainer: {
         marginTop: 10,
@@ -173,17 +156,13 @@ const styles = StyleSheet.create({
         fontSize: 18,
         color: 'black',
     },
-    buttonContainer: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        marginTop: 20,
-    },
     clearButton: {
         padding: 10,
         borderRadius: 5,
         width: ScreenWidth / 3,
         alignItems: 'center',
         backgroundColor: 'black',
+        marginRight: 10, // Add margin for spacing
     },
     clearButtonText: {
         color: Colors.White700,
@@ -197,7 +176,7 @@ const styles = StyleSheet.create({
         borderRadius: 5,
         width: ScreenWidth / 3,
         alignItems: 'center',
-        backgroundColor: 'green',
+        backgroundColor: 'black',
     },
     confirmButtonText: {
         color: Colors.White700,

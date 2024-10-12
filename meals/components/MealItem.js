@@ -1,6 +1,4 @@
-import { View, Text, Pressable, Image, StyleSheet, Dimensions } from "react-native";
 import {
-    useFonts,
     Manrope_200ExtraLight,
     Manrope_300Light,
     Manrope_400Regular,
@@ -8,11 +6,13 @@ import {
     Manrope_600SemiBold,
     Manrope_700Bold,
     Manrope_800ExtraBold,
+    useFonts,
 } from '@expo-google-fonts/manrope';
 import AntDesign from '@expo/vector-icons/AntDesign';
+import { Dimensions, Image, Pressable, StyleSheet, Text, View } from "react-native";
+import { useGlobalContext } from "../context/globalContext";
 import Colors from "../utils/Colors";
-import { useContext } from 'react';
-import { CartContext } from '../context/CartContext';
+import { useMemo } from 'react';
 
 const ScreenWidth = Dimensions.get('window').width;
 const ScreenHeight = Dimensions.get('window').height;
@@ -28,46 +28,50 @@ function MealItem(props) {
         Manrope_800ExtraBold,
     });
 
-    const { cart, addToCart, removeFromCart } = useContext(CartContext);
-    const quantity = cart[props.id] || 0;
+    const { cart, addToCart, removeFromCart } = useGlobalContext();
+
+    // Calculate quantity only when cart changes
+    const quantity = useMemo(() => {
+        const currentItem = cart.find(item => item.meal_id === props.id);
+        return currentItem ? currentItem.quantity : 0;
+    }, [cart, props.id]);
 
     if (!fontsLoaded) {
         return null;
-    } else {
-        const incrementQuantity = () => {
-            addToCart(props.id);
-        };
+    }
 
-        const decrementQuantity = () => {
-            if (quantity > 0) {
-                removeFromCart(props.id);
-            }
-        };
+    const incrementQuantity = () => {
+        addToCart(props.id); // Increment by 1
+    };
 
-        return (
-            <View style={styles.CardStyle}>
-                <View style={styles.InnerContainer}>
-                    <View>
-                        <Image source={{ uri: props.imageURL }} style={styles.imageStyle} />
-                        <Text style={styles.titleStyle}>{props.title}    Price:{`₹${props.price}`}</Text>
-                        <Text style={styles.priceStyle}>Stock Remaining: {props.stock}</Text>
+    const decrementQuantity = () => {
+        if (quantity > 0) {
+            removeFromCart(props.id); // Decrement by 1
+        }
+    };
 
+    return (
+        <View style={styles.CardStyle}>
+            <View style={styles.InnerContainer}>
+                <View>
+                    <Image source={{ uri: props.imageURL }} style={styles.imageStyle} />
+                    <Text style={styles.titleStyle}>{props.title} Price: {`₹${props.price}`}</Text>
+                    <Text style={styles.priceStyle}>Stock Remaining: {props.stock}</Text>
+                </View>
+                <View style={styles.textContainer}>
+                    <Pressable style={({ pressed }) => pressed ? styles.Pressed : null} onPress={decrementQuantity}>
+                        <AntDesign name="minuscircle" size={30} color={Colors.White700} />
+                    </Pressable>
+                    <View style={styles.quantityContainer}>
+                        <Text style={styles.descriptionText}>{quantity}</Text>
                     </View>
-                    <View style={styles.textContainer}>
-                        <Pressable style={({ pressed }) => pressed ? styles.Pressed : null} onPress={decrementQuantity}>
-                            <AntDesign name="minuscircle" size={30} color={Colors.White700} />
-                        </Pressable>
-                        <View style={styles.quantityContainer}>
-                            <Text style={styles.descriptionText}>{quantity}</Text>
-                        </View>
-                        <Pressable style={({ pressed }) => pressed ? styles.Pressed : null} onPress={incrementQuantity}>
-                            <AntDesign name="pluscircle" size={30} color={Colors.White700} />
-                        </Pressable>
-                    </View>
+                    <Pressable style={({ pressed }) => pressed ? styles.Pressed : null} onPress={incrementQuantity}>
+                        <AntDesign name="pluscircle" size={30} color={Colors.White700} />
+                    </Pressable>
                 </View>
             </View>
-        );
-    }
+        </View>
+    );
 }
 
 export default MealItem;

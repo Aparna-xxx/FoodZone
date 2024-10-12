@@ -6,7 +6,6 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { StatusBar } from 'expo-status-bar';
 import React, { useState } from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { CartProvider } from './context/CartContext';
 import { GlobalProvider, useGlobalContext } from './context/globalContext';
 import CartScreen from './screens/CartScreen';
 import CategoryScreen from './screens/CategoryScreen';
@@ -119,11 +118,9 @@ export default function App() {
     <>
       <StatusBar style="light" />
       <GlobalProvider>
-        <CartProvider>
           <NavigationContainer>
             {isAuthenticated ? <DrawerNavigator /> : <StackNavigator />}
           </NavigationContainer>
-        </CartProvider>
       </GlobalProvider>
     </>
   );

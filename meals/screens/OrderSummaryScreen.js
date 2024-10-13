@@ -39,29 +39,21 @@ function OrderSummaryScreen({ navigation }) {
         console.log('Pay via UPI');
     };
 
-    let globalOrderId = null; //global order id so that it can be used in the saveOrderToDB function as well as handlePsgWalletPayment function
     const saveOrderToDB = async () => {
         try {
             const response = await saveOrderToDataBase();
-            console.log('Full response:', response);  // Log the full response to inspect its structure
-            
-            if (response && response.order_id) {  // Check if response and order_id exist
-                const newOrderId = response.order_id;  // Extract order_id
-                globalOrderId = newOrderId;
-                console.log("New order ID: ", globalOrderId); // Log new order ID immediately
-    
-                clearCart();
-                // Pass the newOrderId directly to navigation
-                navigation.navigate('TokenScreen', { orderId: globalOrderId });
-                console.log("Navigating to TokenScreen with Order ID:", globalOrderId); // Log the new order ID for navigation
-            } else {
-                console.error('No order_id in response:', response);
+            console.log(response.data);
+            clearCart();
+
+            if(response.data.response === 'Success'){
+                navigation.navigate('TokenScreen');
             }
+
         } catch (error) {
             console.error("Error saving order: ", error);
         }
     };
-    
+
     
 
     const handlePsgWalletPayment = async () => {
@@ -74,8 +66,6 @@ function OrderSummaryScreen({ navigation }) {
                 await addWalletAmount(userId, newBalance);
                 setWalletBalance(newBalance);
                 await saveOrderToDB();
-                clearCart();
-                navigation.navigate('TokenScreen', { orderId: globalOrderId });
             } catch (error) {
                 console.error("Error processing payment: ", error);
             }

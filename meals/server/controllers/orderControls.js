@@ -62,7 +62,7 @@ exports.saveOrder = async (req, res) => {
         }
         
 
-        res.status(200).json({ message: 'Order saved successfully', order_id });
+        return res.status(200).json({ response : 'Success', order_id });
     } catch (error) {
         console.error('Error in saveOrder:', error);
         res.status(500).json({ error: 'Internal Server Error' });

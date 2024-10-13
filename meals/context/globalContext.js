@@ -4,7 +4,7 @@ import React, { createContext, useContext, useState } from 'react';
 import Category from '../server/models/category';
 import Meal from '../server/models/meal';
 
-const BASE_URL = "http://192.168.100.5:5000/FOOD-ZONE/";
+const BASE_URL = "http://192.168.43.160:5000/FOOD-ZONE/";
 
 const GlobalContext = createContext();
 

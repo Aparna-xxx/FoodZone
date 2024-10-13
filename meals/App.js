@@ -64,6 +64,12 @@ function CustomDrawerContent({ navigation }) {
         <Text style={styles.drawerText}>PSG Wallet</Text>
       </TouchableOpacity>
 
+      {/* Adding TokenScreen to the drawer */}
+      <TouchableOpacity style={styles.drawerItem} onPress={() => navigation.navigate('TokenScreen')}>
+        <Ionicons name="fast-food-outline" size={24} color={Colors.White700} />
+        <Text style={styles.drawerText}>Token</Text>
+      </TouchableOpacity>
+
       <TouchableOpacity style={styles.drawerItem} onPress={handleLogout}>
         <Ionicons name="log-out-outline" size={24} color={Colors.White700} />
         <Text style={styles.drawerText}>Logout</Text>
@@ -118,9 +124,9 @@ export default function App() {
     <>
       <StatusBar style="light" />
       <GlobalProvider>
-          <NavigationContainer>
-            {isAuthenticated ? <DrawerNavigator /> : <StackNavigator />}
-          </NavigationContainer>
+        <NavigationContainer>
+          {isAuthenticated ? <DrawerNavigator /> : <StackNavigator />}
+        </NavigationContainer>
       </GlobalProvider>
     </>
   );

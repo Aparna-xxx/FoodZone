@@ -11,7 +11,7 @@ function OrderSummaryScreen({ navigation }) {
     const [showInsufficientFundsModal, setShowInsufficientFundsModal] = useState(false);
     const [showSuccessModal, setShowSuccessModal] = useState(false);
     const [walletBalance, setWalletBalance] = useState(0);
-    const [orderId, setOrderId] = useState(null);
+    
     
     const { fetchWalletBalance, userId, cartItems, clearCart, totalPrice, addWalletAmount, saveOrderToDataBase } = useGlobalContext();
 
@@ -39,18 +39,7 @@ function OrderSummaryScreen({ navigation }) {
         console.log('Pay via UPI');
     };
 
-    // const saveOrderToDB = async () => {
-    //     try {
-    //         const response = await saveOrderToDataBase();
-    //         console.log(response);
-    //         if (response) {
-    //             clearCart();
-    //             navigation.navigate('TokenScreen');
-    //         }
-    //     } catch (error) {
-    //         console.error("Error saving order: ", error);
-    //     }
-    // };
+    let globalOrderId = null; //global order id so that it can be used in the saveOrderToDB function as well as handlePsgWalletPayment function
     const saveOrderToDB = async () => {
         try {
             const response = await saveOrderToDataBase();
@@ -58,13 +47,13 @@ function OrderSummaryScreen({ navigation }) {
             
             if (response && response.order_id) {  // Check if response and order_id exist
                 const newOrderId = response.order_id;  // Extract order_id
-                setOrderId(newOrderId);
-                console.log("New order ID: ", newOrderId); // Log new order ID immediately
+                globalOrderId = newOrderId;
+                console.log("New order ID: ", globalOrderId); // Log new order ID immediately
     
                 clearCart();
                 // Pass the newOrderId directly to navigation
-                navigation.navigate('TokenScreen', { orderId: newOrderId });
-                console.log("Navigating to TokenScreen with Order ID:", newOrderId); // Log the new order ID for navigation
+                navigation.navigate('TokenScreen', { orderId: globalOrderId });
+                console.log("Navigating to TokenScreen with Order ID:", globalOrderId); // Log the new order ID for navigation
             } else {
                 console.error('No order_id in response:', response);
             }
@@ -86,7 +75,7 @@ function OrderSummaryScreen({ navigation }) {
                 setWalletBalance(newBalance);
                 await saveOrderToDB();
                 clearCart();
-                navigation.navigate('TokenScreen', { orderId });
+                navigation.navigate('TokenScreen', { orderId: globalOrderId });
             } catch (error) {
                 console.error("Error processing payment: ", error);
             }

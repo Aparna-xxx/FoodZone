@@ -90,7 +90,7 @@ function CartScreen({ navigation }) {
                     <View style={styles.totalPriceContainer}>
                         <Text style={styles.totalPriceText}>Total Price: ₹{totalPrice.toFixed(2)}</Text>
                     </View>
-                    <View style={styles.buttonContainer}>
+                    <View style={styles.confirmButtonContainer}>
                         <Pressable style={styles.clearButton} onPress={clearCart}>
                             <Text style={styles.clearButtonText}>Clear Cart</Text>
                         </Pressable>
@@ -132,6 +132,12 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         width: ScreenWidth / 2,
+        justifyContent: 'space-between',
+    },
+    confirmButtonContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        padding:10,
         justifyContent: 'space-between',
     },
     button: {

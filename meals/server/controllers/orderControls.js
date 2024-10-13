@@ -37,19 +37,30 @@ exports.saveOrder = async (req, res) => {
             }
         }
 
-        // Insert all cartItems into the orders table
         for (const item of cartItems) {
             const { meal_id, category_id, title, price, quantity } = item;
-
+        
+            // Insert order into the orders table
             const insertQuery = `
                 INSERT INTO orders (order_id, user_id, meal_id, category_id, title, price, quantity, added_at)
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?)
                 ON DUPLICATE KEY UPDATE
                 title = VALUES(title), price = VALUES(price), added_at = VALUES(added_at)
             `;
-
+        
             await query(insertQuery, [order_id, user_id, meal_id, category_id, title, price, quantity, added_at]);
+        
+            // Reduce stock in meals table for each meal ordered
+            const updateStockQuery = `
+                UPDATE meals
+                SET stock = stock - ?
+                WHERE id = ?
+            `;
+        
+            // Reduce the stock by the quantity of the ordered meal
+            await query(updateStockQuery, [quantity, meal_id]);
         }
+        
 
         res.status(200).json({ message: 'Order saved successfully', order_id });
     } catch (error) {

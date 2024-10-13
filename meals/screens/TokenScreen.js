@@ -1,8 +1,8 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet,Button } from 'react-native';
 import QRCode from 'react-native-qrcode-svg';
 
-const TokenScreen = ({ route }) => {
+const TokenScreen = ({ route,navigation }) => {
   // Access orderId from route.params. Default to null if not provided.
   const orderId = route.params?.orderId; 
   console.log(orderId);
@@ -18,9 +18,13 @@ const TokenScreen = ({ route }) => {
       <Text style={styles.text}>
         Use this E-token to generate physical tokens from the canteen premises
       </Text>
-      <Text style={styles.orderIdText}>
-        Order ID: {orderId || 'Not Available'} {/* Display the order ID or a fallback message */}
-      </Text>
+      <View style={styles.buttonContainer}>
+        <Button 
+          title="Home" 
+          onPress={() => navigation.navigate('MealsCategory')} // Navigate to 'Home' screen
+          color="#000000" // Optional: Set a color for the button
+        />
+      </View>
     </View>
   );
 };
@@ -43,6 +47,12 @@ const styles = StyleSheet.create({
   orderIdText: {
     fontSize: 16,
     color: 'black',
+  },
+  buttonContainer: {
+    marginTop: 40,
+    width: '40%', // Adjust width as per your preference
+    alignSelf: 'center',
+    
   },
 });
 

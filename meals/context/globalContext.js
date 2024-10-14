@@ -4,7 +4,7 @@ import React, { createContext, useContext, useState } from 'react';
 import Category from '../server/models/category';
 import Meal from '../server/models/meal';
 
-const BASE_URL = "http://192.168.95.81:5000/FOOD-ZONE/";
+const BASE_URL = "http://192.168.57.202:5000/FOOD-ZONE/";
 
 const GlobalContext = createContext();
 
@@ -221,9 +221,10 @@ export const GlobalProvider = ({ children }) => {
 
         try {
             const response = await axios.post(`${BASE_URL}saveOrder`, orderData);
-            const orderId = response.order_id;
+            const orderId = response.data.order_id;
             
             setOrderIds(prevOrderIds => [...prevOrderIds, orderId]);
+            
             return response;
         } catch (error) {
             console.error("Error saving order:", error);

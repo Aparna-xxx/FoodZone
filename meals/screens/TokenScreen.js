@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { BackHandler, Button, Dimensions, Modal, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import QRCode from 'react-native-qrcode-svg';
 import { useGlobalContext } from '../context/globalContext';
+import Colours from '../utils/Colors';
 
 const { width, height } = Dimensions.get('window');
 
@@ -14,8 +15,11 @@ const TokenScreen = ({ route }) => {
 
   const { orderIds } = useGlobalContext();
 
+  
+
   useEffect(() => {
     const backAction = () => {
+      console.log(orderIds);
       navigation.navigate('MealsCategory');
       return true;
     };
@@ -50,7 +54,7 @@ const TokenScreen = ({ route }) => {
                 logo={logoFromFile}
                 size={80}
               />
-              <Text style={styles.cardText}>Order ID: {orderId}</Text>
+              <Text style={styles.cardText}> Order ID: {orderId}</Text>
             </TouchableOpacity>
           ))
         ) : (
@@ -146,12 +150,14 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
+
   },
   modalContent: {
-    width: '80%',
+    width: '90%',
+    height:'60%',
     backgroundColor: '#ffffff',
+    paddingTop:'15%',
     borderRadius: 10,
-    padding: 20,
     alignItems: 'center',
     elevation: 10,
   },
@@ -162,7 +168,8 @@ const styles = StyleSheet.create({
   },
   closeButtonText: {
     fontSize: 16,
-    color: '#007BFF',
+    color:Colours.LinkRed,
+    fontWeight:'bold',
   },
   modalText: {
     fontFamily: 'Manrope_400Regular',
